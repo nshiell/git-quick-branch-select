@@ -32,6 +32,39 @@ def exec_cli(cmd, line_callback=None, exit_status_callback=None):
     if exit_status_callback:
         exit_status_callback(p.wait())
 
+
+def sanity_check():
+    if len(sys.argv) > 1:
+        if not os.path.isdir(sys.argv[1]):
+            QMessageBox.critical(win, 'Invalid directory', sys.argv[1] + ' is an invalid directory path', QMessageBox.Ok)
+            sys.exit()
+        os.chdir(sys.argv[1])
+
+    git_installed = False
+    def git_found(l):
+        nonlocal git_installed
+        git_installed = True
+
+    exec_cli('which git', git_found)
+    
+    if not git_installed:
+        QMessageBox.critical(win, 'Git not installed', 'Please install git', QMessageBox.Ok)
+        sys.exit()
+
+    git_dir_found = False
+    def git_dir(l):
+        nonlocal git_dir_found
+        git_dir_found = True
+
+    exec_cli('ls -a . | grep -wF .git', git_dir)
+
+    if not git_dir_found:
+        QMessageBox.critical(win, 'Invalid direcory', os.getcwd() + ' is not a git repository clone', QMessageBox.Ok)
+        sys.exit()
+
+sanity_check()
+
+
 def list_branches_widget_change(model_index):
     def checkout_line(branch_name_raw):
         branch_name = branch_name_raw.strip()
@@ -86,31 +119,6 @@ exec_cli('git branch', add_branch_to_list)
 
 win.resize(520, line_count * 25)
 win.setWindowTitle('Git ' + os.getcwd() + ' [' + current_branch + ']')
-
-def sanity_check():
-    git_installed = False
-    def git_found(l):
-        nonlocal git_installed
-        git_installed = True
-
-    exec_cli('which git', git_found)
-    
-    if not git_installed:
-        QMessageBox.critical(win, 'Git not installed', 'Please install git', QMessageBox.Ok)
-        sys.exit()
-
-    git_dir_found = False
-    def git_dir(l):
-        nonlocal git_dir_found
-        git_dir_found = True
-
-    exec_cli('ls -a . | grep -wF .git', git_dir)
-
-    if not git_dir_found:
-        QMessageBox.critical(win, 'Invalid direcory', os.getcwd() + ' is not a git repository clone', QMessageBox.Ok)
-        sys.exit()
-
-sanity_check()
 
 win.show()
 sys.exit(app.exec_())
