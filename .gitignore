@@ -1,0 +1,4 @@
+__pycache__/
+build/
+dist/
+git-branch-gui.spec

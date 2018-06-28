@@ -8,6 +8,8 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtCore
 import subprocess
 
+os.environ["QT_QPA_PLATFORMTHEME"] = "qt5ct"
+
 app = QApplication(sys.argv)
 
 class Window(QWidget):
@@ -32,9 +34,18 @@ def exec_cli(cmd, line_callback=None, exit_status_callback=None):
     if exit_status_callback:
         exit_status_callback(p.wait())
 
-
 def sanity_check():
-    if len(sys.argv) > 1:
+    if len(sys.argv) > 1 and sys.argv[1] == '--open':
+        dir1 = str(box.getExistingDirectory(win, "Select You Local checkout"))
+
+        
+        
+        print(dir1)
+        if not os.path.isdir(dir1):
+            QMessageBox.critical(win, 'Invalid directory', dir1 + ' is an invalid directory path', QMessageBox.Ok)
+            sys.exit()
+        os.chdir(dir1)
+    elif len(sys.argv) > 1:
         if not os.path.isdir(sys.argv[1]):
             QMessageBox.critical(win, 'Invalid directory', sys.argv[1] + ' is an invalid directory path', QMessageBox.Ok)
             sys.exit()
