@@ -105,7 +105,6 @@ class Model:
 
     def get_should_ask_for_path(self):
         return True if len(self.argv) < 2 else False
-        #return True if len(self.argv) > 1 and self.argv[1] == '--open' else False
         
     def get_branch_names(self, ui_adder):
         def add_branch_to_list(branch_name):
@@ -178,21 +177,41 @@ class Window(QWidget):
     def confirm_checkout(self, branch_name):
         return QMessageBox.question(self,
             'Checkout ' + branch_name + '?',
-            "Do you want to checkout branch:<div style='margin-top: 20px; font-size: 18px'>" + branch_name + "</div>", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            "Do you want to checkout branch:" +
+            '<div style="margin-top: 20px; font-size: 18px">' + branch_name +
+            "</div>",
+            
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
 
     def critical_invalid_dir(self):
         if not self.model.checkout_dir:
-            return QMessageBox.critical(self, 'Invalid directory', 'No directory selected', QMessageBox.Ok)
-        return QMessageBox.critical(self, 'Invalid directory', self.model.checkout_dir + ' is an invalid directory path', QMessageBox.Ok)
+            return QMessageBox.critical(self,
+                'Invalid directory',
+                'No directory selected',
+                QMessageBox.Ok)
+
+        return QMessageBox.critical(self,
+            'Invalid directory',
+            self.model.checkout_dir + ' is an invalid directory path',
+            QMessageBox.Ok)
 
     def critical_checkout_failled(self, branch_name, reason):
-        return QMessageBox.critical(win, 'Checkout failled', 'Unable to checkout branch' + branch_name + '\n' + reason, QMessageBox.Ok)
+        return QMessageBox.critical(self,
+            'Checkout failled',
+            'Unable to checkout branch' + branch_name + '\n' + reason,
+            QMessageBox.Ok)
 
     def critical_not_git_dir(self):
-        return QMessageBox.critical(win, 'Invalid direcory', self.model.checkout_dir + ' is not a git repository clone', QMessageBox.Ok)
+        return QMessageBox.critical(self,
+            'Invalid direcory',
+            self.model.checkout_dir + ' is not a git repository clone',
+            QMessageBox.Ok)
 
     def critical_git_not_installed(self):
-        return QMessageBox.critical(win, 'Git not installed', 'Please install git', QMessageBox.Ok)
+        return QMessageBox.critical(self,
+            'Git not installed',
+            'Please install git',
+            QMessageBox.Ok)
 
 
 class Git_branch_gui:
